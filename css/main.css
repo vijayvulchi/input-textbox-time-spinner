@@ -1,0 +1,41 @@
+.small-container {
+  position: relative;
+  margin: 0 auto;
+  padding: 50px 0;
+  max-width: 200px;
+}
+
+input.form-control {
+  text-align: right;
+}
+
+.time-error {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  display: block;
+  cursor: pointer;
+}
+
+.warning-icon {
+  position: relative;
+  z-index: 0;
+  width: 0;
+  height: 0;
+  display: inline-block;
+  margin-left: 5px;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 12px solid yellow;
+}
+
+.warning-icon::after {
+  content: '!';
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  color: black;
+  line-height: 1;
+  font-size: 11px;
+}
