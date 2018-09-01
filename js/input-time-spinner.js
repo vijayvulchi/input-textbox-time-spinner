@@ -150,11 +150,11 @@ $(document).ready(function () {
                 }
             }, 250);
         }).blur(function () {
-            // if (timeNotifyMsg.text().length > 1) {
-            //     self.inputTime(timeNotifyMsg.text());
-            //     timeNotifyMsg.html('');
-            //     $('#spinner_input_time_dec_btn, #spinner_input_time_inc_btn').prop("disabled", false);
-            // }
+            if (timeNotifyMsg.text().length > 1) {
+                self.inputTime(timeNotifyMsg.text());
+                timeNotifyMsg.html('');
+                $('#spinner_input_time_dec_btn, #spinner_input_time_inc_btn').prop("disabled", false);
+            }
         });
 
         // generate and validate user time function
