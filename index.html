@@ -2,7 +2,7 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>CodePen - html input type text with time format javaScript</title>
+  <title>Vijaya Kumar Vulchi - html input type text with time format javaScript</title>
   <link rel="stylesheet" href="css/normalize.min.css">
   <link rel='stylesheet' href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/main.css">
@@ -10,19 +10,64 @@
 
 <body translate="no" >
 
-    <div class="small-container">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm small-container">
         <div class="input-group">
-            <span id="spinner_input_time_notifier" class="time-error"></span>
-            <input type="text" id="spinner_input_time" class="form-control" data-bind="textInput: inputTime" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
-            <div class="input-group-append" id="button-addon4">
-                <button id="spinner_input_time_dec_btn" class="btn" type="button">-</button>
-                <button id="spinner_input_time_inc_btn" class="btn" type="button">+</button>
-            </div>
+          <span class="spinner-input-time-notifier time-error"></span>
+          <input type="text" class="spinner-input-time form-control" data-bind="textInput: inputTime1" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
+          <div class="input-group-append" id="button-addon4">
+            <button class="spinner-input-time-dec-btn btn" type="button">-</button>
+            <button class="spinner-input-time-inc-btn btn" type="button">+</button>
+          </div>
         </div>
+      </div>
+      <div class="col-sm small-container">
+        <div class="input-group">
+          <span class="spinner-input-time-notifier time-error"></span>
+          <input type="text" class="spinner-input-time form-control" data-bind="textInput: inputTime2" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
+          <div class="input-group-append" id="button-addon4">
+            <button class="spinner-input-time-dec-btn btn" type="button">-</button>
+            <button class="spinner-input-time-inc-btn btn" type="button">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm small-container">
+        <div class="input-group">
+          <span class="spinner-input-time-notifier time-error"></span>
+          <input type="text" class="spinner-input-time form-control" data-bind="textInput: inputTime3" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
+          <div class="input-group-append" id="button-addon4">
+            <button class="spinner-input-time-dec-btn btn" type="button">-</button>
+            <button class="spinner-input-time-inc-btn btn" type="button">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm small-container">
+        <div class="input-group">
+          <span class="spinner-input-time-notifier time-error"></span>
+          <input type="text" class="spinner-input-time form-control" data-bind="textInput: inputTime2" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
+          <div class="input-group-append" id="button-addon4">
+            <button class="spinner-input-time-dec-btn btn" type="button">-</button>
+            <button class="spinner-input-time-inc-btn btn" type="button">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm small-container">
+        <div class="input-group">
+          <span class="spinner-input-time-notifier time-error"></span>
+          <input type="text" class="spinner-input-time form-control" data-bind="textInput: inputTime3" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
+          <div class="input-group-append" id="button-addon4">
+            <button class="spinner-input-time-dec-btn btn" type="button">-</button>
+            <button class="spinner-input-time-inc-btn btn" type="button">+</button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
   
   <script src='js/jquery.min.js'></script>
   <script src="js/knockout-min.js"></script>
+  <script src="js/viewModel.js"></script>
   <script src="js/input-time-spinner.js"></script>
 </body>
 

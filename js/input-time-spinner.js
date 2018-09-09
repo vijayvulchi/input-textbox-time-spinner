@@ -1,242 +1,190 @@
-$(document).ready(function () {
-    var defaultInputTime = '14:00';
-    var viewModel = function () {
-        var incBtn = $('#spinner_input_time_inc_btn');
-        var decBtn = $('#spinner_input_time_dec_btn');
-        var inputTime = $('#spinner_input_time');
-        var timeNotifyMsg = $('#spinner_input_time_notifier');
-        var date = new Date();
-        var hours = false;
-        var getUserInputTimeValue;
-        var twoFourHours = true;
-        var oneTwoHours = false;
-        var timeout = null;
-        var self = this;
-        self.inputTime = ko.observable(defaultInputTime);
+function initializeTimeSpinner() {
+    $.each($('.spinner-input-time'), function (key, element) {
+        registerTimeSpinner(element);
+    });
+}
 
-        // leading zeros
-        function leadingZeros(time) {
-            if (time < 10) {
-                time = '0' + time;
-            }
-            return time;
+function registerTimeSpinner (ele) {
+    var inputCurrentElement = ele;
+    var defalutTimeSpinner = "14:00";
+    timeUpDown(inputCurrentElement, defalutTimeSpinner);
+}
+
+
+
+function timeUpDown (ele, val) {
+    // variables
+    var incBtn = $(ele).next().find('.spinner-input-time-inc-btn');
+    var decBtn = $(ele).next().find('.spinner-input-time-dec-btn');
+    // default setting time for each input value.
+    hoursCaret = false;
+    amPmCaret = false;
+    twelveHours = false;
+    $(ele).val(val);
+
+    twelveHours = true;
+    if (twelveHours) {
+        twelveHour();
+    }
+
+    // twelve hours default setup
+    function twelveHour () {
+        var getHours = $(ele).val().split(':')[0];
+        var getMinutes = $(ele).val().split(':').pop();
+        if (getHours == '00' ) {
+            $(ele).val(leadingZeros(Number(getHours)) + ':' + getMinutes + ' ' + 'AM');
+        } else if (getHours < 13) {
+            $(ele).val(leadingZeros(Number(getHours)) + ':' + getMinutes + ' ' + 'AM');
+        } else {
+            $(ele).val(leadingZeros(Number(getHours) - 12) + ':' + getMinutes + ' ' + 'PM');
         }
+    }
 
-        // increase/decrease hours and minutes
-        incBtn.on('click', function () {
-            incDate();
-        });
-        decBtn.on('click', function () {
-            decDate();
-        });
-        
-        // focus
-        inputTime.focus(function () {
-            inputTime.on('mouseup click', function () {
-                if (this.selectionStart < 3) {
-                    hours = true;
-                } else {
-                    hours = false;
-                }
-            });
-        });
-        // increase/decrease hours and minutes when you keyup & keydown
-        inputTime.keyup(function (event) {
-            if (event.which == 38) {
-                incDate();
-            }
-            if (event.which == 40) {
-                decDate();
-            }
-            if (event.which == 37 || event.which == 39) {
-                if (this.selectionEnd < 3) {
-                    hours = true;
-                } else {
-                    hours = false;
-                }
-            }
-        });
+    // leading zeros
+    function leadingZeros(time) {
+        if (time < 10) {
+            time = '0' + time;
+        }
+        return time;
+    }
 
-        // increase hours/minutes
-        function incDate() {
-            var getHours = inputTime.val().split(':')[0];
-            var getMinutes = inputTime.val().split(':').pop();
-            if (hours) {
+    // increase/decrease hours and minutes
+    incBtn.on('click', function () {
+        incTime();
+    });
+    decBtn.on('click', function () {
+        decTime();
+    });
+
+    // focus
+    $(ele).focus(function () {
+        $(ele).on('mouseup click', function () {
+            if (this.selectionStart < 3) {
+                hoursCaret = true;
+                amPmCaret = false;
+            } else if (this.selectionStart > 3 && this.selectionStart < 6) {
+                hoursCaret = false;
+                amPmCaret = false;
+            } else {
+                amPmCaret = true;
+                console.log('am pm caret true');
+            }
+        });
+    });
+
+    // increase/decrease hours and minutes when you keyup & keydown
+    $(ele).keyup(function (event) {
+        if (event.which == 38) {
+            incTime();
+        }
+        if (event.which == 40) {
+            decTime();
+        }
+        if (event.which == 37 || event.which == 39) {
+            if (this.selectionEnd < 3) {
+                hours = true;
+                amPmCaret = false;
+            } else if (this.selectionStart > 3 && this.selectionStart < 6) {
+                hours = false;
+                amPmCaret = false;
+            } else {
+                amPmCaret = true;
+                console.log('am pm caret true');
+            }
+        }
+    });
+
+    // increase hours/minutes
+    function incTime() {
+        var getHours = $(ele).val().split(':')[0];
+        var getMinutes = $(ele).val().split(':')[1];
+        if (twelveHours) {
+            var splitMinutes = getMinutes.split(' ')[0];
+            var splitAmPm = getMinutes.split(' ').pop();
+            if (hoursCaret) {
+                if (getHours < 12) {
+                    $(ele).val(leadingZeros(Number(getHours) + 1) + ':' + splitMinutes + ' ' + splitAmPm);
+                } else {
+                    $(ele).val(leadingZeros(Number(getHours) - 12) + ':' + splitMinutes + ' ' + splitAmPm);
+                }
+            } else {
+               if (splitMinutes < 59) {
+                    $(ele).val(getHours + ':' + (leadingZeros(Number(splitMinutes) + 1) + ' ' + splitAmPm));
+                } else {
+                    if (getHours < 23) {
+                        $(ele).val(leadingZeros(Number(getHours) + 1) + ':' + '00' + ' ' + splitAmPm);
+                    } else {
+                        $(ele).val('00' + ':' + '00' + ' ' + splitAmPm);
+                    }
+                } 
+            }
+        } else {
+            if (hoursCaret) {
                 if (getHours < 23) {
-                    self.inputTime(leadingZeros(Number(getHours) + 1) + ':' + getMinutes);
+                    $(ele).val(leadingZeros(Number(getHours) + 1) + ':' + getMinutes);
                 } else {
-                    self.inputTime('00' + ':' + getMinutes);
+                    $(ele).val('00' + ':' + getMinutes);
                 }
             } else {
                 if (getMinutes < 59) {
-                    self.inputTime(getHours + ':' + leadingZeros(Number(getMinutes) + 1));
+                    $(ele).val(getHours + ':' + leadingZeros(Number(getMinutes) + 1));
                 } else {
-                    self.inputTime(getHours + ':' + '00');
+                    if (getHours < 23) {
+                        $(ele).val(leadingZeros(Number(getHours) + 1) + ':' + '00');
+                    } else {
+                        $(ele).val('00' + ':' + '00');
+                    }
                 }
             }
         }
-        // decrease hours/minutes
-        function decDate() {
-            var getHours = inputTime.val().split(':')[0];
-            var getMinutes = inputTime.val().split(':').pop();
-            if (hours) {
-                if (getHours <= 23 && getHours != '00') {
-                    self.inputTime(leadingZeros(Number(getHours) - 1) + ':' + getMinutes);
+        // self.parent.ReleaseConditionTime($(ele).val());
+    }
+
+    // decrease hours/minutes
+    function decTime() {
+        var getHours = $(ele).val().split(':')[0];
+        var getMinutes = $(ele).val().split(':')[1];
+        if (twelveHours) {
+            var splitMinutes = getMinutes.split(' ')[0];
+            var splitAmPm = getMinutes.split(' ').pop();
+            if (hoursCaret) {
+                if (getHours <= 12 && getHours != '00') {
+                    $(ele).val(leadingZeros(Number(getHours) - 1) + ':' + splitMinutes + ' ' + splitAmPm);
                 } else {
-                    self.inputTime('23' + ':' + getMinutes);
+                    $(ele).val(leadingZeros(Number(getHours) + 12) + ':' + splitMinutes + ' ' + splitAmPm);
+                }
+            } else {
+               if (splitMinutes <= 59 && splitMinutes != '00') {
+                    $(ele).val(getHours + ':' + (leadingZeros(Number(splitMinutes) - 1) + ' ' + splitAmPm));
+                } else {
+                    if (getHours < 23 && getHours != '00') {
+                        $(ele).val(leadingZeros(Number(getHours) - 1) + ':' + '59' + ' ' + splitAmPm);
+                    } else {
+                        $(ele).val('23' + ':' + '59' + ' ' + splitAmPm);
+                    }
+                } 
+            }
+        } else {
+            if (hoursCaret) {
+                if (getHours <= 23 && getHours != '00') {
+                    $(ele).val(leadingZeros(Number(getHours) - 1) + ':' + getMinutes);
+                } else {
+                    $(ele).val('23' + ':' + getMinutes);
                 }
             } else {
                 if (getMinutes <= 59 && getMinutes != '00') {
-                    self.inputTime(getHours + ':' + leadingZeros(Number(getMinutes) - 1));
+                    $(ele).val(getHours + ':' + leadingZeros(Number(getMinutes) - 1));
                 } else {
-                    self.inputTime(getHours + ':' + '59');
-                }
-            }
-        }
-
-        /*
-        * user manually entered input time format validations
-        */
-    
-        // warning
-        function warningWidthCurrentDate() {
-            timeNotifyMsg.html(leadingZeros(date.getHours()) + ':' + leadingZeros(date.getMinutes()) + "<span class='warning-icon'></span>");
-            $('#spinner_input_time_dec_btn, #spinner_input_time_inc_btn').prop("disabled", true);
-        }
-    
-        // time suggest popup
-        function suggestTimePopup(suggestedTime) {
-            timeNotifyMsg.html('');
-            timeNotifyMsg.text(suggestedTime);
-        }
-
-        // apply suggest popup time
-        timeNotifyMsg.on('click', function () {
-            self.inputTime($(this).text());
-            timeNotifyMsg.html('');
-            $('#spinner_input_time_dec_btn, #spinner_input_time_inc_btn').prop("disabled", false);
-        });
-
-        inputTime.on('keyup', function () {
-            getUserInputTimeValue = inputTime.val();
-            // Clear the timeout if it has already been set.
-            // This will prevent the previous task from executing
-            // if it has been less than <MILLISECONDS>
-            clearTimeout(timeout);
-            // Make a new timeout set to go off in 800ms
-            timeout = setTimeout(function () {
-                if (getUserInputTimeValue.length == 0) {
-                    warningWidthCurrentDate();
-                } else if (getUserInputTimeValue.length <= 5) {
-                    var getHours;
-                    var getMinutes;
-                    if ((getUserInputTimeValue.length == 5) && (getUserInputTimeValue.indexOf(':') > - 1) && (getUserInputTimeValue.substring(2, 3) == ':')) {
-                        timeNotifyMsg.html('');
-                        $('#spinner_input_time_dec_btn, #spinner_input_time_inc_btn').prop("disabled", false);
-                        getHours = getUserInputTimeValue.substring(0,2);
-                        getMinutes = getUserInputTimeValue.substring(3);
-                        if (getHours < 24 && getMinutes < 60) {
-                            self.inputTime(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-                        } else {
-                            warningWidthCurrentDate();
-                        }
+                    if (getHours < 23 && getHours != '00') {
+                        $(ele).val(leadingZeros(Number(getHours) - 1) + ':' + '59');
                     } else {
-                        if (getUserInputTimeValue.length < 5) {
-                            generateTime(getUserInputTimeValue);
-                        }
-                    }
-                } else {
-                    warningWidthCurrentDate();
-                }
-            }, 250);
-        }).blur(function () {
-            if (timeNotifyMsg.text().length > 1) {
-                self.inputTime(timeNotifyMsg.text());
-                timeNotifyMsg.html('');
-                $('#spinner_input_time_dec_btn, #spinner_input_time_inc_btn').prop("disabled", false);
-            }
-        });
-
-        // generate and validate user time function
-        function generateTime (userinput) {
-            var userInput = userinput;
-            var getHours;
-            var getMinutes;
-            if (! (userInput.indexOf(':') > -1)) {
-                timeNotifyMsg.html('');
-                if (userInput.length == 4) {
-                    console.log('length 4');
-                    getHours = userInput.substring(0,2);
-                    getMinutes = userInput.substring(2);
-                    if (getHours < 24 && getMinutes < 60) {
-                        suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-                    } else {
-                        warningWidthCurrentDate();
-                    }
-                }
-                if (userInput.length == 3) {
-                    console.log('length 3');
-                    getHours = userInput.substring(0,2);
-                    getMinutes = userInput.substring(2);
-                    if (getHours < 24) {
-                        suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-                    } else {
-                        getHours = userInput.substring(0,1);
-                        getMinutes = userInput.substring(1);
-                        if (getMinutes < 60) {
-                            suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-                        } else {
-                            warningWidthCurrentDate();
-                        }
-                    }
-                }
-                if (userInput.length == 2) {
-                    getHours = userInput.substring(0,2);
-                    if (getHours < 24) {
-                        suggestTimePopup(leadingZeros(Number(getHours)) + ':' + '00');
-                    } else {
-                        getHours = userInput.substring(0,1);
-                        getMinutes = userInput.substring(1);
-                        if (getMinutes < 60) {
-                            suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-                        } else {
-                            warningWidthCurrentDate();
-                        }
-                    }
-                }
-                if (userInput.length == 1) {
-                    getHours = userInput.substring(0,1);
-                    suggestTimePopup(leadingZeros(Number(getHours)) + ':' + '00');
-                }
-            } else {
-                if ((userInput.substring(0, 1) == ':') || (userInput.substring(3, 4) == ':')) {
-                    warningWidthCurrentDate();
-                } else if ((userInput.length == 2) && (userInput.substring(1, 2) == ':')) {
-                    getHours = userInput.substring(0, 1);
-                    suggestTimePopup(leadingZeros(Number(getHours)) + ':' + '00')
-                } else { //if (userInput.length <= 4) 
-                    if (userInput.substring(1, 2) == ':') {
-                        getHours = userInput.substring(0, 1);
-                        getMinutes = userInput.substring(2);
-                        if (getMinutes < 60) {
-                            suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-                        } else {
-                            warningWidthCurrentDate();
-                        }
-                    }
-                    if (userInput.substring(2, 3) == ':') {
-                        getHours = userInput.substring(0, 2);
-                        getMinutes = userInput.substring(3);
-                        if (getHours < 24) {
-                            suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-                        } else {
-                            warningWidthCurrentDate();
-                        }
+                        $(ele).val('23' + ':' + '59');
                     }
                 }
             }
         }
-    };
-    
-    ko.applyBindings(viewModel);
-});
+        // self.parent.ReleaseConditionTime($(ele).val());
+    }
+}
+
+initializeTimeSpinner();
