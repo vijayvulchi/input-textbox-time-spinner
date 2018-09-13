@@ -2,6 +2,7 @@ function timeSpinner (parent, ele, userTimeFormat, bindEle) {
 	// variables
     self.incBtn = $(ele).next().find('.spinner-input-time-inc-btn');
     self.decBtn = $(ele).next().find('.spinner-input-time-dec-btn');
+    self.notification = $(ele).parent().find('.spinner-input-time-notifier');
     self.hoursCaret = false;
     self.amPmCaret = false;
 
@@ -16,6 +17,7 @@ function timeSpinner (parent, ele, userTimeFormat, bindEle) {
         }
         return time;
     }
+
     // twelve hours default setup
     function twelveHours () {
         var getHours = $(ele).val().split(':')[0];
@@ -28,16 +30,6 @@ function timeSpinner (parent, ele, userTimeFormat, bindEle) {
             bindEle(leadingZeros(Number(getHours) - 12) + ':' + getMinutes + ' ' + 'PM');
         }
     }
-    // twenty four hours default setup
-    // function twentyFourHours () {
-    //     var getHours = $(ele).val().split(':')[0];
-    //     var getMinutes = $(ele).val().split(':').pop();
-    //     if (getHours < 24 && getHours != '00' && getMinutes < 60) {
-    //         $(ele).val(leadingZeros(Number(getHours)) + ':' + getMinutes);
-    //     } else {
-    //         console.log('error')
-    //     }
-    // }
 
     // increase hours and minutes
     self.incBtn.unbind().click(function () {
@@ -46,10 +38,15 @@ function timeSpinner (parent, ele, userTimeFormat, bindEle) {
         updateIncreamentTime(getHours, getMinutes);
     });
 
+    // decrease hours and minutes
+    self.decBtn.unbind().click(function () {
+        var getHours = $(ele).val().split(':')[0];
+        var getMinutes = $(ele).val().split(':')[1];
+        updateDecreamentTime(getHours, getMinutes);
+    });
+
     // focus
     $(ele).on('focus click', function () {
-        // $(ele).on('mouseup ', function () {
-        // });
         if (this.selectionStart < 3) {
             hoursCaret = true;
             amPmCaret = false;
@@ -63,32 +60,28 @@ function timeSpinner (parent, ele, userTimeFormat, bindEle) {
 
     // increase/decrease hours and minutes
     // when you keyup & keydown
-    // $(ele).keyup(function (event) {
-    //     if (event.which == 38) {
-    //         incTime();
-    //     }
-    //     if (event.which == 40) {
-    //         decTime();
-    //     }
-    //     if (event.which == 37 || event.which == 39) {
-    //         if (this.selectionEnd < 3) {
-    //             hoursCaret = true;
-    //             amPmCaret = false;
-    //         } else if (this.selectionStart > 3 && this.selectionStart < 6) {
-    //             hoursCaret = false;
-    //             amPmCaret = false;
-    //         } else {
-    //             amPmCaret = true;
-    //             console.log('am pm caret true');
-    //         }
-    //     }
-    // });
-
-    // decrease hours and minutes
-    self.decBtn.unbind().click(function () {
-        var getHours = $(ele).val().split(':')[0];
-        var getMinutes = $(ele).val().split(':')[1];
-        updateDecreamentTime(getHours, getMinutes);
+    $(ele).keyup(function (event) {
+        if (event.which == 38) {
+	        var getHours = $(ele).val().split(':')[0];
+	        var getMinutes = $(ele).val().split(':')[1];
+	        updateIncreamentTime(getHours, getMinutes);
+        }
+        if (event.which == 40) {
+	        var getHours = $(ele).val().split(':')[0];
+	        var getMinutes = $(ele).val().split(':')[1];
+	        updateDecreamentTime(getHours, getMinutes);
+        }
+        if (event.which == 37 || event.which == 39) {
+            if (this.selectionEnd < 3) {
+                hoursCaret = true;
+                amPmCaret = false;
+            } else if (this.selectionStart > 3 && this.selectionStart < 6) {
+                hoursCaret = false;
+                amPmCaret = false;
+            } else {
+                amPmCaret = true;
+            }
+        }
     });
 
     function ampmCarets (getHours, getMinutes, tt) {
@@ -149,6 +142,7 @@ function timeSpinner (parent, ele, userTimeFormat, bindEle) {
     	}
     }
 
+	// decreament hours/minutes
     function updateDecreamentTime(getHours, getMinutes) {
     	if (userTimeFormat == 0 && getMinutes.length > 2) {
     		// 12 hours code
