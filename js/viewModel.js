@@ -1,16 +1,12 @@
-function timeSpinner (parent, ele, bindEle) {
+function timeSpinner (parent, ele, userTimeFormat, bindEle) {
 	// variables
     self.incBtn = $(ele).next().find('.spinner-input-time-inc-btn');
     self.decBtn = $(ele).next().find('.spinner-input-time-dec-btn');
     self.hoursCaret = false;
     self.amPmCaret = false;
 
-    if (parent.userTimeFormat() == 0) {
-    	console.log('12 hours');
+    if (userTimeFormat == 0) {
         twelveHours();
-    } else {
-    	console.log('24 hours');
-    	twentyFourHours();
     }
 	
 	// leading zeros
@@ -33,15 +29,15 @@ function timeSpinner (parent, ele, bindEle) {
         }
     }
     // twenty four hours default setup
-    function twentyFourHours () {
-        var getHours = $(ele).val().split(':')[0];
-        var getMinutes = $(ele).val().split(':').pop();
-        if (getHours < 24 && getHours != '00' && getMinutes < 60) {
-            $(ele).val(leadingZeros(Number(getHours)) + ':' + getMinutes);
-        } else {
-            console.log('error')
-        }
-    }
+    // function twentyFourHours () {
+    //     var getHours = $(ele).val().split(':')[0];
+    //     var getMinutes = $(ele).val().split(':').pop();
+    //     if (getHours < 24 && getHours != '00' && getMinutes < 60) {
+    //         $(ele).val(leadingZeros(Number(getHours)) + ':' + getMinutes);
+    //     } else {
+    //         console.log('error')
+    //     }
+    // }
 
     // increase hours and minutes
     self.incBtn.unbind().click(function () {
@@ -105,7 +101,7 @@ function timeSpinner (parent, ele, bindEle) {
 
     // increase hours/minutes
     function updateIncreamentTime(getHours, getMinutes) {
-    	if (parent.userTimeFormat() == 0 && getMinutes.length > 2) {
+    	if (userTimeFormat == 0 && getMinutes.length > 2) {
     		// 12 hours code
     		var splitMinutes = getMinutes.split(' ')[0];
             var splitAmPm = getMinutes.split(' ').pop();
@@ -132,16 +128,29 @@ function timeSpinner (parent, ele, bindEle) {
 	    		}
             }
     	} else {
-    		// 24 hours code
-    		// am/pm carots
-    		// hours
-    		// minutes
+    		if (hoursCaret) {
+                if (getHours < 23) {
+                    bindEle(leadingZeros(Number(getHours) + 1) + ':' + getMinutes);
+                } else {
+                    bindEle('00' + ':' + getMinutes);
+                }
+            } else {
+    			// minutes
+                if (getMinutes < 59) {
+                    bindEle(getHours + ':' + leadingZeros(Number(getMinutes) + 1));
+                } else {
+                    if (getHours < 23) {
+                        bindEle(leadingZeros(Number(getHours) + 1) + ':' + '00');
+                    } else {
+                        bindEle('00' + ':' + '00');
+                    }
+                }
+            }
     	}
-        // self.parent.ReleaseConditionTime($(ele).val());
     }
 
     function updateDecreamentTime(getHours, getMinutes) {
-    	if (parent.userTimeFormat() == 0 && getMinutes.length > 2) {
+    	if (userTimeFormat == 0 && getMinutes.length > 2) {
     		// 12 hours code
     		var splitMinutes = getMinutes.split(' ')[0];
             var splitAmPm = getMinutes.split(' ').pop();
@@ -169,11 +178,24 @@ function timeSpinner (parent, ele, bindEle) {
             }
     	} else {
     		// 24 hours code
-    		// am/pm carets
-    		// hours
-    		// minutes
+    		if (hoursCaret) {
+                if (getHours <= 23 && getHours != '00') {
+                    bindEle(leadingZeros(Number(getHours) - 1) + ':' + getMinutes);
+                } else {
+                    bindEle('23' + ':' + getMinutes);
+                }
+            } else {
+                if (getMinutes <= 59 && getMinutes != '00') {
+                    bindEle(getHours + ':' + leadingZeros(Number(getMinutes) - 1));
+                } else {
+                    if (getHours < 23 && getHours != '00') {
+                        bindEle(leadingZeros(Number(getHours) - 1) + ':' + '59');
+                    } else {
+                        bindEle('23' + ':' + '59');
+                    }
+                }
+            }
     	}
-        // self.parent.ReleaseConditionTime($(ele).val());
     }
 }
 
@@ -186,24 +208,23 @@ $(document).ready(function () {
 		self.backendKeyThree = ko.observable(self.defalutSpinnerTime);
 		self.backendKeyFour = ko.observable(self.defalutSpinnerTime);
 		self.backendKeyFive = ko.observable(self.defalutSpinnerTime);
+		self.backendKeySix = ko.observable(self.defalutSpinnerTime);
+		self.backendKeySeven = ko.observable(self.defalutSpinnerTime);
+		self.backendKeyEight = ko.observable(self.defalutSpinnerTime);
+		self.backendKeyNine = ko.observable(self.defalutSpinnerTime);
+		self.backendKeyTen = ko.observable(self.defalutSpinnerTime);
 		// time format is 0 means 12 hours, 1 means 24 hours
-		self.userTimeFormat = ko.observable(1);
-		// self.selectDropdown = $('#set_time_format');
-		// self.selectDropdown.one('change', function () {
-		// 	if ($(this).val() != 0) {
-		// 		self.userTimeFormat(1);
-		// 		console.log('not equal to 0');
-		// 	} else {
-		// 		self.userTimeFormat(0);
-		// 		console.log('equal to 0');
-		// 	}
-		// });
 		setTimeout(function () {
-			self.inputTime1 = new timeSpinner(self, '#spinner1', self.backendKeyOne);
-			self.inputTime2 = new timeSpinner(self, '#spinner2', self.backendKeyTwo);
-			self.inputTime3 = new timeSpinner(self, '#spinner3', self.backendKeyThree);
-			self.inputTime4 = new timeSpinner(self, '#spinner4', self.backendKeyFour);
-			self.inputTime5 = new timeSpinner(self, '#spinner5', self.backendKeyFive);
+			self.inputTime1 = new timeSpinner(self, '#spinner1', 0, self.backendKeyOne);
+			self.inputTime2 = new timeSpinner(self, '#spinner2', 0, self.backendKeyTwo);
+			self.inputTime3 = new timeSpinner(self, '#spinner3', 0, self.backendKeyThree);
+			self.inputTime4 = new timeSpinner(self, '#spinner4', 0, self.backendKeyFour);
+			self.inputTime5 = new timeSpinner(self, '#spinner5', 0, self.backendKeyFive);
+			self.inputTime6 = new timeSpinner(self, '#spinner6', 1, self.backendKeySix);
+			self.inputTime7 = new timeSpinner(self, '#spinner7', 1, self.backendKeySeven);
+			self.inputTime8 = new timeSpinner(self, '#spinner8', 1, self.backendKeyEight);
+			self.inputTime9 = new timeSpinner(self, '#spinner9', 1, self.backendKeyNine);
+			self.inputTime10 = new timeSpinner(self, '#spinner10', 1, self.backendKeyTen);
 		}, 100);
 	};
 

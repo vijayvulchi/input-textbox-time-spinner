@@ -1,6 +1,10 @@
-.small-container {
+.p-lg {
   padding-top: 50px;
   padding-bottom: 50px;
+}
+.small-container {
+  padding-top: 15px;
+  padding-bottom: 25px;
 }
 
 .pb-md {
