@@ -11,11 +11,19 @@
 <body translate="no" >
 
   <div class="container">
+    <!-- <div class="row">
+      <div class="col-sm align-center">
+        <select id="set_time_format" data-bind="value: userTimeFormat">
+          <option value="0">12 hours</option>
+          <option value="1">24 hours</option>
+        </select>
+      </div>
+    </div> -->
     <div class="row">
       <div class="col-sm small-container">
         <div class="input-group">
           <span class="spinner-input-time-notifier time-error"></span>
-          <input type="text" class="spinner-input-time form-control" data-bind="textInput: inputTime1" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
+          <input type="text" id="spinner1" class="spinner-input-time form-control" data-bind="textInput: backendKeyOne" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
           <div class="input-group-append" id="button-addon4">
             <button class="spinner-input-time-dec-btn btn" type="button">-</button>
             <button class="spinner-input-time-inc-btn btn" type="button">+</button>
@@ -25,7 +33,7 @@
       <div class="col-sm small-container">
         <div class="input-group">
           <span class="spinner-input-time-notifier time-error"></span>
-          <input type="text" class="spinner-input-time form-control" data-bind="textInput: inputTime2" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
+          <input type="text" id="spinner2" class="spinner-input-time form-control" data-bind="textInput: backendKeyTwo" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
           <div class="input-group-append" id="button-addon4">
             <button class="spinner-input-time-dec-btn btn" type="button">-</button>
             <button class="spinner-input-time-inc-btn btn" type="button">+</button>
@@ -35,7 +43,7 @@
       <div class="col-sm small-container">
         <div class="input-group">
           <span class="spinner-input-time-notifier time-error"></span>
-          <input type="text" class="spinner-input-time form-control" data-bind="textInput: inputTime3" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
+          <input type="text" id="spinner3" class="spinner-input-time form-control" data-bind="textInput: backendKeyThree" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
           <div class="input-group-append" id="button-addon4">
             <button class="spinner-input-time-dec-btn btn" type="button">-</button>
             <button class="spinner-input-time-inc-btn btn" type="button">+</button>
@@ -45,7 +53,7 @@
       <div class="col-sm small-container">
         <div class="input-group">
           <span class="spinner-input-time-notifier time-error"></span>
-          <input type="text" class="spinner-input-time form-control" data-bind="textInput: inputTime2" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
+          <input type="text" id="spinner4" class="spinner-input-time form-control" data-bind="textInput: backendKeyFour" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
           <div class="input-group-append" id="button-addon4">
             <button class="spinner-input-time-dec-btn btn" type="button">-</button>
             <button class="spinner-input-time-inc-btn btn" type="button">+</button>
@@ -55,7 +63,7 @@
       <div class="col-sm small-container">
         <div class="input-group">
           <span class="spinner-input-time-notifier time-error"></span>
-          <input type="text" class="spinner-input-time form-control" data-bind="textInput: inputTime3" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
+          <input type="text" id="spinner5" class="spinner-input-time form-control" data-bind="textInput: backendKeyFive" placeholder="hh-mm" aria-label="time" aria-describedby="button-addon4">
           <div class="input-group-append" id="button-addon4">
             <button class="spinner-input-time-dec-btn btn" type="button">-</button>
             <button class="spinner-input-time-inc-btn btn" type="button">+</button>
@@ -68,7 +76,6 @@
   <script src='js/jquery.min.js'></script>
   <script src="js/knockout-min.js"></script>
   <script src="js/viewModel.js"></script>
-  <script src="js/input-time-spinner.js"></script>
 </body>
 
 </html>
