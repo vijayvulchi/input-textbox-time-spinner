@@ -62,6 +62,7 @@ function timeSpinner (parent, ele, systemTime, bindEle) {
         }
     });
 
+    // updating AM/PM when user clicks increment or decrement buttons
     function ampmCarets (getHours, getMinutes, tt) {
         if (tt === 'AM') {
             bindEle(getHours + ':' + getMinutes + ' ' + 'PM');
@@ -155,8 +156,64 @@ function timeSpinner (parent, ele, systemTime, bindEle) {
         }
         else if (hoursCaret) {
             // hours decrement
+            var splitAmPm = getMinutes.split(' ').pop(); // to get AM/PM
+            getMinutes = systemTime ? getMinutes.split(' ')[0] : getMinutes;
+            if (getHours < 24 && getHours != '00') {
+                if (systemTime) {
+                    if (getHours < 12) {
+                        getHours = leadingZeros(Number(getHours) - 1);
+                        if (getHours == '00') {
+                            if (splitAmPm == 'AM') {
+                                bindEle('12' + ':' + getMinutes + ' PM');
+                            } else {
+                                bindEle('12' + ':' + getMinutes + ' AM');
+                            }
+                        } else {
+                            bindEle(getHours + ':' + getMinutes + ' ' + splitAmPm);
+                        }
+                    } else {
+                        bindEle('11' + ':' + getMinutes + ' ' + splitAmPm);
+                    }
+                } else {
+                    bindEle(leadingZeros(Number(getHours) - 1) + ':' + getMinutes);
+                }
+            } else {
+                bindEle('23' + ':' + getMinutes);
+            }
         } else {
             // minutes decrement
+            var splitAmPm = getMinutes.split(' ').pop(); // to get AM/PM
+            getMinutes = systemTime ? getMinutes.split(' ')[0] : getMinutes;
+            if (getMinutes <= 59 && getMinutes != '00') {
+                if (systemTime) {
+                    bindEle(getHours + ':' + leadingZeros(Number(getMinutes) - 1) + ' ' + splitAmPm);
+                } else {
+                    bindEle(getHours + ':' + leadingZeros(Number(getMinutes) - 1));
+                }
+            } else {
+                if (getHours < 24 && getHours != '00') {
+                    if (systemTime) {
+                        if (getHours < 12) {
+                            getHours = leadingZeros(Number(getHours) - 1);
+                            if (getHours == '00') {
+                                if (splitAmPm == 'AM') {
+                                    bindEle('12' + ':' + '59' + ' PM');
+                                } else {
+                                    bindEle('12' + ':' + '59' + ' AM');
+                                }
+                            } else {
+                                bindEle(getHours + ':' + '59' + ' ' + splitAmPm);
+                            }
+                        } else {
+                            bindEle('01' + ':' + '59' + ' ' + splitAmPm);
+                        }
+                    } else {
+                        bindEle(leadingZeros(Number(getHours) - 1) + ':' + '59');
+                    }
+                } else {
+                    bindEle('23' + ':' + '59');
+                }
+            }
         }
     }
 
