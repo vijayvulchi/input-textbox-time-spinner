@@ -1,4 +1,4 @@
-function timeSpinner (parent, ele, userTimeFormat, bindEle) {
+function timeSpinner (parent, ele, systemTime, bindEle) {
 	// variables
     self.incBtn = $(ele).next().find('.spinner-input-time-inc-btn');
     self.decBtn = $(ele).next().find('.spinner-input-time-dec-btn');
@@ -10,7 +10,7 @@ function timeSpinner (parent, ele, userTimeFormat, bindEle) {
     self.date = new Date();
     self.timeout = null;
 
-    if (userTimeFormat == 0) {
+    if (systemTime) {
         twelveHours();
     }
 	
@@ -27,11 +27,11 @@ function timeSpinner (parent, ele, userTimeFormat, bindEle) {
         var getHours = $(ele).val().split(':')[0];
         var getMinutes = $(ele).val().split(':').pop();
         if (getHours == '00' ) {
-            bindEle(leadingZeros(Number(getHours)) + ':' + getMinutes + ' ' + 'AM');
+            bindEle(leadingZeros(Number(getHours)) + ':' + getMinutes + ' AM');
         } else if (getHours < 13) {
-            bindEle(leadingZeros(Number(getHours)) + ':' + getMinutes + ' ' + 'AM');
+            bindEle(leadingZeros(Number(getHours)) + ':' + getMinutes + ' AM');
         } else {
-            bindEle(leadingZeros(Number(getHours) - 12) + ':' + getMinutes + ' ' + 'PM');
+            bindEle(leadingZeros(Number(getHours) - 12) + ':' + getMinutes + ' PM');
         }
     }
 
@@ -39,14 +39,14 @@ function timeSpinner (parent, ele, userTimeFormat, bindEle) {
     self.incBtn.unbind().click(function () {
         var getHours = $(ele).val().split(':')[0];
         var getMinutes = $(ele).val().split(':')[1];
-        updateIncreamentTime(getHours, getMinutes);
+        updateIncrementTime(getHours, getMinutes);
     });
 
     // decrease hours and minutes
     self.decBtn.unbind().click(function () {
         var getHours = $(ele).val().split(':')[0];
         var getMinutes = $(ele).val().split(':')[1];
-        updateDecreamentTime(getHours, getMinutes);
+        updateDecrementTime(getHours, getMinutes);
     });
 
     // focus
@@ -62,309 +62,110 @@ function timeSpinner (parent, ele, userTimeFormat, bindEle) {
         }
     });
 
-    // increase/decrease hours and minutes
-    // when you keyup & keydown
-    $(ele).keyup(function (event) {
-        if (event.which == 38) {
-	        var getHours = $(ele).val().split(':')[0];
-	        var getMinutes = $(ele).val().split(':')[1];
-	        updateIncreamentTime(getHours, getMinutes);
-        }
-        if (event.which == 40) {
-	        var getHours = $(ele).val().split(':')[0];
-	        var getMinutes = $(ele).val().split(':')[1];
-	        updateDecreamentTime(getHours, getMinutes);
-        }
-        if (event.which == 37 || event.which == 39) {
-            if (this.selectionEnd < 3) {
-                hoursCaret = true;
-                amPmCaret = false;
-            } else if (this.selectionStart > 3 && this.selectionStart < 6) {
-                hoursCaret = false;
-                amPmCaret = false;
-            } else {
-                amPmCaret = true;
-            }
-        }
-        // validations starts here by calling the function.
-        self.getUserInputTimeValue = $(ele).val();
-        // Clear the timeout if it has already been set.
-        // This will prevent the previous task from executing
-        // if it has been less than <MILLISECONDS>
-        clearTimeout(timeout);
-        // Make a new timeout set to go off in 800ms
-        timeout = setTimeout(function () {
-    		self.notification = $(ele).parent().find('.spinner-input-time-notifier');
-    		//self.regex = (?:^$)|(?:^([0-9]|0[1-9]|1[0-9]|2[0-4])(:|\.)[0-5][0-9]$)|(?:^([1-9]|0[1-9]|1[0-2])(:|\.)[0-5][0-9] (A|a|P|p)(M|m)$)
-        	if (self.getUserInputTimeValue.length == 0) {
-				warningWithCurrentTime();
-        	} else {
-        		regerateUserInputTime(self.getUserInputTimeValue, self.notification);
-        	}
-        }, 250);
-    }).blur(function () {
-        if (self.notification.text().length > 1) {
-            bindEle(self.notification.text());
-            self.notification.html('');
-	        $(ele).next().find('.spinner-input-time-inc-btn').prop('disabled', false);
-	        $(ele).next().find('.spinner-input-time-dec-btn').prop('disabled', false);
-        }
-    });
-
-    // warning
-    function warningWithCurrentTime () {
-    	if (userTimeFormat == 0) {
-    		if (self.date.getHours() > 12) {
-    			self.ampmText = 'PM';
-    		}
-    		self.twelveTime = self.date.getHours() - 12;
-			self.notification.html(leadingZeros(self.twelveTime) + ':' + leadingZeros(self.date.getMinutes()) + ' ' + self.ampmText + "<span class='warning-icon'></span>");
-    	} else {
-		 	self.notification.html(leadingZeros(self.date.getHours()) + ':' + leadingZeros(self.date.getMinutes()) + "<span class='warning-icon'></span>");
-    	}
-        $(ele).next().find('.spinner-input-time-inc-btn').prop('disabled', true);
-        $(ele).next().find('.spinner-input-time-dec-btn').prop('disabled', true);
-    }
-
-    // time suggest popup
-    function suggestTimePopup (suggestedTime) {
-        self.notification.html('');
-        self.notification.text(suggestedTime);
-    }
-
     function ampmCarets (getHours, getMinutes, tt) {
-    	if (tt === 'AM') {
-			bindEle(getHours + ':' + getMinutes + ' ' + 'PM');
-    	} else {
-			bindEle(getHours + ':' + getMinutes + ' ' + 'AM');
-    	}
+        if (tt === 'AM') {
+            bindEle(getHours + ':' + getMinutes + ' ' + 'PM');
+        } else {
+            bindEle(getHours + ':' + getMinutes + ' ' + 'AM');
+        }
     }
 
     // increase hours/minutes
-    function updateIncreamentTime(getHours, getMinutes) {
-    	if (userTimeFormat == 0 && getMinutes.length > 2) {
-    		// 12 hours code
-    		var splitMinutes = getMinutes.split(' ')[0];
+    function updateIncrementTime(getHours, getMinutes) {
+        if (amPmCaret) {
+            var splitMinutes = getMinutes.split(' ')[0];
             var splitAmPm = getMinutes.split(' ').pop();
-            // am/pm carets
-            if (amPmCaret) {
-            	ampmCarets(getHours, splitMinutes, splitAmPm);
-            } else if (hoursCaret) {
-            	// hours
-            	if (getHours < 12) {
-                    bindEle(leadingZeros(Number(getHours) + 1) + ':' + splitMinutes + ' ' + splitAmPm);
+            ampmCarets(getHours, splitMinutes, splitAmPm);
+        }
+        else if (hoursCaret) {
+            // hours increment
+            var splitAmPm = getMinutes.split(' ').pop(); // to get AM/PM
+            getMinutes = systemTime ? getMinutes.split(' ')[0] : getMinutes;
+            if (getHours < 24) {
+                if (systemTime) {
+                    if (getHours < 12) {
+                        getHours = leadingZeros(Number(getHours) + 1);
+                        if (getHours == 12) {
+                            if (splitAmPm == 'AM') {
+                                bindEle(getHours + ':' + getMinutes + ' PM');
+                            } else {
+                                bindEle(getHours + ':' + getMinutes + ' AM');
+                            }
+                        } else {
+                            bindEle(getHours + ':' + getMinutes + ' ' + splitAmPm);
+                        }
+                    } else {
+                        bindEle('01' + ':' + getMinutes + ' ' + splitAmPm);
+                    }
                 } else {
-                    bindEle(leadingZeros(Number(getHours) - 12) + ':' + splitMinutes + ' ' + splitAmPm);
+                    getHours = leadingZeros(Number(getHours) + 1);
+                    if (getHours == 24) {
+                        bindEle('00' + ':' + getMinutes);
+                    } else {
+                        bindEle(getHours + ':' + getMinutes);
+                    }
                 }
-            } else {
-	    		// minutes
-	    		if (splitMinutes < 59) {
-					bindEle(getHours + ':' + (leadingZeros(Number(splitMinutes) + 1) + ' ' + splitAmPm));
-	    		} else {
-	    			if (getHours < 12) {
-						bindEle(leadingZeros(Number(getHours) + 1) + ':' + '00' + ' ' + splitAmPm);
-	    			} else {
-	    				bindEle('01' + ':' + '00' + ' ' + splitAmPm);	
-	    			}
-	    		}
             }
-    	} else {
-    		if (hoursCaret) {
-                if (getHours < 23) {
-                    bindEle(leadingZeros(Number(getHours) + 1) + ':' + getMinutes);
+        } else {
+            // minutes increment
+            var splitAmPm = getMinutes.split(' ').pop(); // to get AM/PM
+            getMinutes = systemTime ? getMinutes.split(' ')[0] : getMinutes;
+            if (getMinutes < 59) {
+                if (systemTime) {
+                    bindEle(getHours + ':' + leadingZeros(Number(getMinutes) + 1) + ' ' + splitAmPm);
                 } else {
-                    bindEle('00' + ':' + getMinutes);
-                }
-            } else {
-    			// minutes
-                if (getMinutes < 59) {
                     bindEle(getHours + ':' + leadingZeros(Number(getMinutes) + 1));
-                } else {
-                    if (getHours < 23) {
-                        bindEle(leadingZeros(Number(getHours) + 1) + ':' + '00');
+                }
+            } else {
+                if (getHours < 24) {
+                    if (systemTime) {
+                        if (getHours < 12) {
+                            getHours = leadingZeros(Number(getHours) + 1);
+                            if (getHours == 12) {
+                                if (splitAmPm == 'AM') {
+                                    bindEle(getHours + ':' + '00' + ' PM');
+                                } else {
+                                    bindEle(getHours + ':' + '00' + ' AM');
+                                }
+                            } else {
+                                bindEle(getHours + ':' + '00' + ' ' + splitAmPm);
+                            }
+                        } else {
+                            bindEle('01' + ':' + '00' + ' ' + splitAmPm);
+                        }
                     } else {
-                        bindEle('00' + ':' + '00');
+                        getHours = leadingZeros(Number(getHours) + 1);
+                        if (getHours == 24) {
+                            bindEle('00' + ':' + '00');
+                        } else {
+                            bindEle(getHours + ':' + '00');
+                        } 
                     }
                 }
             }
-    	}
+        }
     }
 
-	// decreament hours/minutes
-    function updateDecreamentTime(getHours, getMinutes) {
-    	if (userTimeFormat == 0 && getMinutes.length > 2) {
-    		// 12 hours code
-    		var splitMinutes = getMinutes.split(' ')[0];
+    // decreament hours/minutes
+    function updateDecrementTime(getHours, getMinutes) {
+        if (amPmCaret) {
+            var splitMinutes = getMinutes.split(' ')[0];
             var splitAmPm = getMinutes.split(' ').pop();
-            // am/pm carets
-            if (amPmCaret) {
-            	ampmCarets(getHours, splitMinutes, splitAmPm);
-            } else if (hoursCaret) {
-				// hours
-				if (getHours <= 12 && getHours != '00') {
-                    bindEle(leadingZeros(Number(getHours) - 1) + ':' + splitMinutes + ' ' + splitAmPm);
-                } else {
-                    bindEle(leadingZeros(Number(getHours) + 12) + ':' + splitMinutes + ' ' + splitAmPm);
-                }
-            } else {
-	    		// minutes
-	    		if (splitMinutes <= 59 && splitMinutes != '00') {
-					bindEle(getHours + ':' + (leadingZeros(Number(splitMinutes) - 1) + ' ' + splitAmPm));
-	    		} else {
-	    			if (getHours < 13 && getHours != '00') {
-						bindEle(leadingZeros(Number(getHours) - 1) + ':' + '59' + ' ' + splitAmPm);
-	    			} else {
-	    				bindEle('12' + ':' + '59' + ' ' + splitAmPm);	
-	    			}
-	    		}
-            }
-    	} else {
-    		// 24 hours code
-    		if (hoursCaret) {
-                if (getHours <= 23 && getHours != '00') {
-                    bindEle(leadingZeros(Number(getHours) - 1) + ':' + getMinutes);
-                } else {
-                    bindEle('23' + ':' + getMinutes);
-                }
-            } else {
-                if (getMinutes <= 59 && getMinutes != '00') {
-                    bindEle(getHours + ':' + leadingZeros(Number(getMinutes) - 1));
-                } else {
-                    if (getHours < 23 && getHours != '00') {
-                        bindEle(leadingZeros(Number(getHours) - 1) + ':' + '59');
-                    } else {
-                        bindEle('23' + ':' + '59');
-                    }
-                }
-            }
-    	}
+            ampmCarets(getHours, splitMinutes, splitAmPm);
+        }
+        else if (hoursCaret) {
+            // hours decrement
+        } else {
+            // minutes decrement
+        }
     }
 
-    function regerateUserInputTime (currentInputTime, notificationBox) {
-    	self.notification.html('');
-    	var userInput = currentInputTime;
-    	var getHours;
-    	var getMinutes;
-		if ((userInput.substring(0, 1) != ':') && (userInput.substring(3, 4) != ':')) {
-			if (userInput.length < 3) {
-				if (userInput.substring(1, 2) == ':') {
-					getHours = userInput.substring(0, 1);
-					if (userTimeFormat == 0) {
-						suggestTimePopup(leadingZeros(Number(getHours)) + ':' + '00' + ' AM');
-					} else {
-						suggestTimePopup(leadingZeros(Number(getHours)) + ':' + '00');
-					}
-				} else {
-					getHours = userInput.substring(0, 2);
-					if (getHours < 24) {
-						if (userTimeFormat == 0) {
-							if (getHours < 13) {
-								suggestTimePopup(leadingZeros(Number(getHours)) + ':' + '00' + ' AM');
-							} else {
-								getHours = (Number(getHours) - 12);
-								suggestTimePopup(leadingZeros(Number(getHours)) + ':' + '00' + ' PM');
-							}
-						} else {
-							suggestTimePopup(leadingZeros(Number(getHours)) + ':' + '00');
-						}
-					} else {
-						getHours = userInput.substring(0, 1);
-						getMinutes = userInput.substring(1, 2);
-						if (userTimeFormat == 0) {
-							suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)) + ' AM');
-						} else {
-							suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-						}
-					}
-				}
-			} else if (userInput.length > 2 && userInput.length < 6) {
-				if (userInput.substring(1, 2) == ':') {
-					getHours = userInput.substring(0, 1);
-					getMinutes = userInput.substring(2);
-					if (getMinutes < 60) {
-						if (userTimeFormat == 0) {
-							suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)) + ' AM');
-						} else {
-							suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-						}
-					} else {
-						warningWithCurrentTime();
-					}
-				} else if (userInput.substring(2, 3) == ':') {
-					getHours = userInput.substring(0, 2);
-					getMinutes = userInput.substring(3);
-					if (getHours < 24 && getMinutes < 60) {
-						if (userTimeFormat == 0) {
-							if (getHours < 13) {
-								suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)) + ' AM');
-							} else {
-								getHours = (Number(getHours) - 12);
-								suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)) + ' PM');
-							}
-						} else {
-							suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-						}
-					} else {
-						getHours = userInput.substring(0, 1);
-						var a = userInput.substring(1, 2);
-						var b = userInput.substring(3);
-						getMinutes = a + b;
-						if (getMinutes < 60) {
-							if (userTimeFormat == 0) {
-								suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)) + ' AM');
-							} else {
-								suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-							}
-						} else {
-							warningWithCurrentTime();
-						}
-					}
-				} else {
-					getHours = userInput.substring(0, 2);
-					getMinutes = userInput.substring(2);
-					if (getHours < 24 && getMinutes < 60) {
-						if (userTimeFormat == 0) {
-							if (getHours < 13) {
-								suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)) + ' AM');
-							} else {
-								getHours = (Number(getHours) - 12);
-								suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)) + ' PM');
-							}
-						} else {
-							suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-						}
-					} else {
-						getHours = userInput.substring(0, 1);
-						getMinutes = userInput.substring(1);
-						if (getMinutes < 60) {
-							if (userTimeFormat == 0) {
-								if (getHours < 13) {
-									suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)) + ' AM');
-								} else {
-									getHours = (Number(getHours) - 12);
-									suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)) + ' PM');
-								}
-							} else {
-								suggestTimePopup(leadingZeros(Number(getHours)) + ':' + leadingZeros(Number(getMinutes)));
-							}
-						} else {
-							warningWithCurrentTime();
-						}
-					}
-				}
-			} else {
-				warningWithCurrentTime();
-			}
-		} else {
-			warningWithCurrentTime();
-		}
-    }
 }
 
 $(document).ready(function () {
 	var viewModel = function () {
 		var self = this;
-	    self.defalutSpinnerTime = "14:00";
+	    self.defalutSpinnerTime = "23:00";
 		self.backendKeyOne = ko.observable(self.defalutSpinnerTime);
 		self.backendKeyTwo = ko.observable(self.defalutSpinnerTime);
 		self.backendKeyThree = ko.observable(self.defalutSpinnerTime);
@@ -375,18 +176,20 @@ $(document).ready(function () {
 		self.backendKeyEight = ko.observable(self.defalutSpinnerTime);
 		self.backendKeyNine = ko.observable(self.defalutSpinnerTime);
 		self.backendKeyTen = ko.observable(self.defalutSpinnerTime);
-		// time format is 0 means 12 hours, 1 means 24 hours
+        // time format is 0 means 12 hours, 1 means 24 hours
+        self.systemTimeTwelveHours = true;
+        self.systemTimeTwentyFourHours = false;
 		setTimeout(function () {
-			self.inputTime1 = new timeSpinner(self, '#spinner1', 0, self.backendKeyOne);
-			self.inputTime2 = new timeSpinner(self, '#spinner2', 0, self.backendKeyTwo);
-			self.inputTime3 = new timeSpinner(self, '#spinner3', 0, self.backendKeyThree);
-			self.inputTime4 = new timeSpinner(self, '#spinner4', 0, self.backendKeyFour);
-			self.inputTime5 = new timeSpinner(self, '#spinner5', 0, self.backendKeyFive);
-			self.inputTime6 = new timeSpinner(self, '#spinner6', 1, self.backendKeySix);
-			self.inputTime7 = new timeSpinner(self, '#spinner7', 1, self.backendKeySeven);
-			self.inputTime8 = new timeSpinner(self, '#spinner8', 1, self.backendKeyEight);
-			self.inputTime9 = new timeSpinner(self, '#spinner9', 1, self.backendKeyNine);
-			self.inputTime10 = new timeSpinner(self, '#spinner10', 1, self.backendKeyTen);
+			self.inputTime1 = new timeSpinner(self, '#spinner1', self.systemTimeTwelveHours, self.backendKeyOne);
+			self.inputTime2 = new timeSpinner(self, '#spinner2', self.systemTimeTwelveHours, self.backendKeyTwo);
+			self.inputTime3 = new timeSpinner(self, '#spinner3', self.systemTimeTwelveHours, self.backendKeyThree);
+			self.inputTime4 = new timeSpinner(self, '#spinner4', self.systemTimeTwelveHours, self.backendKeyFour);
+			self.inputTime5 = new timeSpinner(self, '#spinner5', self.systemTimeTwelveHours, self.backendKeyFive);
+			self.inputTime6 = new timeSpinner(self, '#spinner6', self.systemTimeTwentyFourHours, self.backendKeySix);
+			self.inputTime7 = new timeSpinner(self, '#spinner7', self.systemTimeTwentyFourHours, self.backendKeySeven);
+			self.inputTime8 = new timeSpinner(self, '#spinner8', self.systemTimeTwentyFourHours, self.backendKeyEight);
+			self.inputTime9 = new timeSpinner(self, '#spinner9', self.systemTimeTwentyFourHours, self.backendKeyNine);
+			self.inputTime10 = new timeSpinner(self, '#spinner10', self.systemTimeTwentyFourHours, self.backendKeyTen);
 		}, 100);
 	};
 
