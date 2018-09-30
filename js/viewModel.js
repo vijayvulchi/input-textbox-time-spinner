@@ -217,6 +217,93 @@ function timeSpinner (parent, ele, systemTime, bindEle) {
         }
     }
 
+    // increase/decrease hours and minutes
+    // when you keyup & keydown
+    $(ele).keyup(function (event) {
+        if (event.which == 38) {
+            var getHours = $(ele).val().split(':')[0];
+            var getMinutes = $(ele).val().split(':')[1];
+            updateIncreamentTime(getHours, getMinutes);
+        }
+        if (event.which == 40) {
+            var getHours = $(ele).val().split(':')[0];
+            var getMinutes = $(ele).val().split(':')[1];
+            updateDecreamentTime(getHours, getMinutes);
+        }
+        if (event.which == 37 || event.which == 39) {
+            if (this.selectionEnd < 3) {
+                hoursCaret = true;
+                amPmCaret = false;
+            } else if (this.selectionStart > 3 && this.selectionStart < 6) {
+                hoursCaret = false;
+                amPmCaret = false;
+            } else {
+                amPmCaret = true;
+            }
+        }
+        // validations starts here by calling the function.
+        self.getUserInputTimeValue = $(ele).val();
+        // Clear the timeout if it has already been set.
+        // This will prevent the previous task from executing
+        // if it has been less than <MILLISECONDS>
+        clearTimeout(timeout);
+        // Make a new timeout set to go off in 800ms
+        timeout = setTimeout(function () {
+         self.notification = $(ele).parent().find('.spinner-input-time-notifier');
+         if (self.getUserInputTimeValue.length == 0) {
+             warningWithCurrentTime();
+         } else {
+            var twentyFourHourRegex = ["[0-2]","[0-3]",":","[0-5]","[0-9]";
+            var twelvelHourRegex = ["[0-2]","[0-3]",":","[0-5]","[0-9]"," ","(A|P)","M"];
+            if (systemTime) {
+                generateUserInputTime(self.getUserInputTimeValue, self.notification, twentyFourHourRegex);
+            } else {
+                generateUserInputTime(self.getUserInputTimeValue, self.notification, twelvelHourRegex);
+            }
+         }
+        }, 250);
+    }).blur(function () {
+        if (self.notification.text().length > 1) {
+            bindEle(self.notification.text());
+            self.notification.html('');
+            $(ele).next().find('.spinner-input-time-inc-btn').prop('disabled', false);
+            $(ele).next().find('.spinner-input-time-dec-btn').prop('disabled', false);
+        }
+    });
+
+    // warning
+    function warningWithCurrentTime () {
+        if (systemTime) {
+            if (self.date.getHours() > 12) {
+                self.ampmText = 'PM';
+            }
+            self.twelveTime = self.date.getHours() - 12;
+            self.notification.html(leadingZeros(self.twelveTime) + ':' + leadingZeros(self.date.getMinutes()) + ' ' + self.ampmText + "<span class='warning-icon'></span>");
+        } else {
+                self.notification.html(leadingZeros(self.date.getHours()) + ':' + leadingZeros(self.date.getMinutes()) + "<span class='warning-icon'></span>");
+        }
+        $(ele).next().find('.spinner-input-time-inc-btn').prop('disabled', true);
+        $(ele).next().find('.spinner-input-time-dec-btn').prop('disabled', true);
+    }
+
+    // time suggest popup
+    function suggestTimePopup (suggestedTime) {
+        self.notification.html('');
+        self.notification.text(suggestedTime);
+    }
+
+    // generate user input time validation
+    function generateUserInputTime (val, notify) {
+        string = $(this).val() + String.fromCharCode(e.which),
+        b = true;
+        for (var i = 0; i < string.length; i++) {
+            if (!new RegExp("^" + regex[i] + "$").test(string[i])) {
+                b = false;
+            }
+        }
+        return b;
+    }
+
 }
 
 $(document).ready(function () {
