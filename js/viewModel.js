@@ -253,7 +253,7 @@ function timeSpinner (parent, ele, systemTime, bindEle) {
          if (self.getUserInputTimeValue.length == 0) {
              warningWithCurrentTime();
          } else {
-            var twentyFourHourRegex = ["[0-2]","[0-3]",":","[0-5]","[0-9]";
+            var twentyFourHourRegex = ["[0-2]","[0-3]",":","[0-5]","[0-9]"];
             var twelvelHourRegex = ["[0-2]","[0-3]",":","[0-5]","[0-9]"," ","(A|P)","M"];
             if (systemTime) {
                 generateUserInputTime(self.getUserInputTimeValue, self.notification, twentyFourHourRegex);
