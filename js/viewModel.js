@@ -16,7 +16,7 @@ function timeSpinner (parent, ele, systemTime, bindEle) {
     
     // leading zeros
     function leadingZeros(time) {
-        if (time < 10 && time != 0 && time.length != 2) {
+        if (time < 10) {
             time = '0' + time;
         }
         return time;
